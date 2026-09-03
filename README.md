@@ -1,28 +1,54 @@
 # Упаковка в Docker Compose
 
 [![hexlet-check](https://github.com/titanmen1/devops-engineer-from-scratch-project-74/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/titanmen1/devops-engineer-from-scratch-project-74/actions)
+[![push](https://github.com/titanmen1/devops-engineer-from-scratch-project-74/actions/workflows/push.yml/badge.svg)](https://github.com/titanmen1/devops-engineer-from-scratch-project-74/actions/workflows/push.yml)
 
 Автоматизация развертывания и обновления локального окружения с помощью Docker Compose, Github Actions (CI), Makefile
 
 Учебный проект Хекслета: https://ru.hexlet.io/programs/devops-engineer-from-scratch
 Как это должно работать: https://asciinema.org/a/zVrFYtslVReMsTyqEEetdWUY5
 
+В контейнере упаковано приложение [js-fastify-blog](https://github.com/hexlet-components/js-fastify-blog).
+Готовый образ для продакшена: [titanmen/devops-engineer-from-scratch-project-74](https://hub.docker.com/r/titanmen/devops-engineer-from-scratch-project-74)
+
 ## Стек
 
-- Инструменты
+- Node.js 26, Fastify, PostgreSQL
+- Docker, Docker Compose
+- Caddy (reverse proxy, https из коробки)
+- Github Actions (CI/CD)
+
+## Требования
+
+- Docker
+- Docker Compose версии не ниже 1.27.0
 
 ## Установка
-
-<!-- Опишите установку: клонирование, зависимости, переменные окружения -->
 
 ```bash
 git clone https://github.com/titanmen1/devops-engineer-from-scratch-project-74.git
 cd devops-engineer-from-scratch-project-74
+cp .env.example .env
+make setup
 ```
 
 ## Использование
 
-<!-- Добавьте примеры запуска и запись asciinema — именно это смотрит работодатель -->
+```bash
+# Запуск окружения (app + db + caddy)
+make up
+
+# Приложение конфигурируется переменными окружения из .env
+# https://localhost — главная страница (самоподписной сертификат)
+
+# Тесты (внутри Docker, тот же образ, что и в CI)
+make test
+
+# Остановка
+make down
+```
+
+<!-- Добавьте запись asciinema — именно это смотрит работодатель -->
 
 ---
 
