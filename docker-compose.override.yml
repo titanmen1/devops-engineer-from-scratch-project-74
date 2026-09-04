@@ -8,3 +8,13 @@ services:
     ports:
       - "8080:8080"
     command: make dev
+
+  caddy:
+    image: caddy:latest
+    volumes:
+      - ./services/caddy/Caddyfile:/etc/caddy/Caddyfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
