@@ -1,19 +1,19 @@
 setup: prepare-env
-	docker-compose run --rm app make setup
+	docker compose run --rm app make setup
 
 prepare-env:
 	test -f .env || cp .env.example .env
 
 build:
-	docker-compose build
+	docker compose build
 
 up: prepare-env
-	docker-compose up
+	docker compose up
 
 down:
-	docker-compose down
+	docker compose down
 
 test: prepare-env
-	docker-compose -f docker-compose.yml up --abort-on-container-exit --exit-code-from app
+	docker compose -f docker-compose.yml up --abort-on-container-exit --exit-code-from app
 
 ci: test
