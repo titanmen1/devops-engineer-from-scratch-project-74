@@ -28,9 +28,10 @@
 ```bash
 git clone https://github.com/titanmen1/devops-engineer-from-scratch-project-74.git
 cd devops-engineer-from-scratch-project-74
-cp .env.example .env
 make setup
 ```
+
+`make setup` сам копирует `.env.example` в `.env`, если файла ещё нет, и ставит зависимости.
 
 ## Использование
 
@@ -43,6 +44,9 @@ make up
 
 # Тесты (внутри Docker, тот же образ, что и в CI)
 make test
+
+# Линтер и проверка форматирования (внутри Docker)
+make lint
 
 # Остановка
 make down
