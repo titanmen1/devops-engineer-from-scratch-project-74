@@ -1,5 +1,42 @@
 # Требования автотестов Хекслета (hexlet-check) к этому проекту
 
+## Главное: задание и автотесты рассинхронизированы с upstream приложения
+
+**Инструкция (`10-setup.md`) говорит клонировать `js-fastify-blog` из upstream,
+но автотесты Хекслета написаны под другую версию этого приложения.**
+
+Upstream в какой-то момент переехал на pnpm (коммит `7493e2e chore: migrate to
+pnpm and oxlint/oxfmt`). А `hexlet/project-action` остался рассчитан на
+npm-версию. В upstream такой ревизии вообще нет: там либо старое приложение без
+drizzle/vite (до `7493e2e`), либо уже pnpm. Рабочая npm-версия существует
+**только в эталонном решении** — `__data__/../code/app`.
+
+Из-за этого рассинхрона ломается всё подряд:
+
+- `cd code/app && make setup` проверка выполняет **на голом раннере**, где есть
+  `npm`, но нет ни `pnpm`, ни `corepack`
+- `Dockerfile.production` по инструкции делает `npm ci`, а `package-lock.json` в
+  pnpm-версии просто нет
+
+**Не лечите симптомы.** Ставить pnpm через `corepack enable` или
+`npm install -g pnpm` в `app/Makefile` — тупик: чинится один шаг, следом падает
+следующий. Правильное решение — взять приложение из эталонного решения:
+
+```bash
+# REF — путь к эталонному решению, у каждого свой
+REF=~/projects/hexlet/reference_projects/devops_docker_compose_project/code/app
+rm -rf app
+cp -R "$REF" app
+rm -rf app/node_modules app/dist app/database
+```
+
+Признак, что взяли нужную версию: в `app/` лежит `package-lock.json`, а
+`app/Makefile` в цели `install` вызывает `npm install`, а не `pnpm install`.
+
+Признак, что вы столкнулись именно с этим: в логе прогона
+`make[1]: pnpm: No such file or directory` или `make[1]: corepack: No such file
+or directory` на шаге `cd code/app && make setup`.
+
 ## Цель
 
 Зафиксировать, что именно проверяет `hexlet/project-action` в проекте
@@ -37,9 +74,7 @@ docker compose -f docker-compose.yml run --rm test
 3. **`cd code/app && make setup` выполняется на раннере вне Docker.** В PATH там
    только `node`/`npm`; ни `pnpm`, ни `corepack` нет.
 4. **Приложение должно быть npm-версией** `js-fastify-blog` (с
-   `package-lock.json`). Свежий клон upstream уже на pnpm — с ним падает и п.3, и
-   `npm ci` в `Dockerfile.production`. Рабочая npm-версия лежит в эталонном
-   решении: `__data__/../code/app`; в upstream такой ревизии нет.
+   `package-lock.json`) — см. раздел «Главное» в начале файла.
 5. **Миграции нужно накатывать перед тестами.** `server/plugin.js` их не
    применяет, тесты идут в пустую базу и падают с `42P01 relation "articles"
    does not exist`. Команда сервиса `test`:
