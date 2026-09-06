@@ -1,7 +1,7 @@
 setup: install build
 
 install:
-	corepack enable
+	npm install -g pnpm@11.24.0
 	pnpm install
 
 build:
