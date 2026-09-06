@@ -88,6 +88,12 @@ gh run view <run-id> --log-failed | tail -60
   версии. Либо монтировать `/var/lib/postgresql`, либо закрепить `postgres:16`.
 - **`extends` резолвится до мержа override-файлов**, поэтому сервис `test`
   наследует продакшен-вариант `app`, а не dev — это нужное поведение.
+- **Образ должен быть под linux/amd64.** Раннер Хекслета — amd64; образ,
+  собранный на Apple Silicon обычным `docker build`, кладётся в реестр только
+  как arm64, и проверка падает с `no matching manifest for linux/amd64`.
+  Собирать так:
+  `docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile.production -t <repo>:latest --push .`
+  В CI за это отвечают `setup-qemu-action` + `platforms:` в `build-push-action`.
 - **Образ в Docker Hub надо обновлять до пуша кода.** Обе проверки делают
   `docker compose pull` и берут `latest` из реестра; если там лежит образ от
   прошлой версии приложения, прогон упадёт на командах, которых в нём ещё нет
