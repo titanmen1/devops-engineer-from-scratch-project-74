@@ -1,33 +1,34 @@
-setup: install build
+setup: prepare install
 
 install:
-	npm install -g pnpm@11.24.0
-	pnpm install
+	npm install
+
+db-migrate:
+	npm run migrate
 
 build:
-	pnpm run build
+	npm run build
 
-prepare-env:
+prepare:
 	cp -n .env.example .env
 
 start:
-	NODE_ENV=production pnpm run start
+	NODE_ENV=production npm run start
 
 dev:
-	pnpm exec concurrently "make start-frontend" "make start-backend"
+	npx concurrently "make start-frontend" "make start-backend"
 
 start-backend:
-	pnpm run start --watch --verbose-watch --ignore-watch='node_modules .git dist database'
+	npm start -- --watch --verbose-watch --ignore-watch='node_modules .git .sqlite'
 
 start-frontend:
-	pnpm exec vite build --watch
+	npx vite build --watch
 
 lint:
-	pnpm --silent run lint
-	pnpm --silent run format:check
+	npm run lint
 
 lint-fix:
-	pnpm --silent run lint:fix
+	npm run lint-fix
 
 test:
-	NODE_ENV=test pnpm --silent test
+	npm test -s

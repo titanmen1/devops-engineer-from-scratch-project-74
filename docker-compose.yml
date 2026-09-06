@@ -16,7 +16,9 @@ services:
 
   test:
     extends: app
-    command: make test
+    # Миграции накатываются перед тестами: приложение их на старте не применяет,
+    # а тесты идут в чистую базу, где ещё нет ни одной таблицы
+    command: sh -c "make db-migrate && make test"
 
   db:
     image: postgres:16

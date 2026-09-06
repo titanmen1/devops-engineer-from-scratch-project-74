@@ -3,4 +3,3 @@
 app/node_modules
 app/dist
 app/database
-app/.pnpm-store

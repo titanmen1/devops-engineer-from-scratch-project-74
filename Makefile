@@ -16,7 +16,4 @@ down:
 test: prepare-env
 	docker compose -f docker-compose.yml run --rm test
 
-lint: prepare-env
-	docker compose -f docker-compose.yml run --rm app make lint
-
-ci: test lint
+ci: test

@@ -1,5 +1,5 @@
 <% layout("../layouts/application", { header: it.t('views.articles.edit.header') }) %>
-<form class="mb-6" action="<%= it.route('article', { id: it.article.id }) %>" method="post">
+<form action="<%= it.route('article', { id: it.article.id }) %>" method="post">
   <%~ include("../mixins/input", { entity: it.article, propertyName: 'title', errors: it.errors, type: 'text' }) %>
   <%~ include("../mixins/textarea", {
     entity: it.article,

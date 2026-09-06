@@ -3,23 +3,16 @@
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
+// Собирается только стиль: js на клиенте у приложения нет, страницы рендерит шаблонизатор на сервере
+// на сервере. Имя файла фиксировано, потому что шаблон зовёт его как main.css.
 export default defineConfig({
   plugins: [tailwindcss()],
   build: {
     outDir: "dist",
-    // Точка входа это css, а не js: своего кода на клиенте у блога нет. Формы
-    // отправляет браузер, подтверждение удаления делает `confirm` в атрибуте.
-    // Клиентский бандл существовал ради javascript Bootstrap и @rails/ujs, и
-    // ушёл вместе с ними.
-    //
-    // Имя без хеша: страницу рендерит шаблонизатор, а он просит файл по имени
-    // (`assetPath('main.css')`). Хеш потребовал бы читать manifest.json из
-    // шаблона, а кеш ассетов у демо-приложения не проблема.
+    emptyOutDir: true,
     rollupOptions: {
-      input: "src/styles.css",
-      output: {
-        assetFileNames: "main[extname]",
-      },
+      input: "assets/css/source.css",
+      output: { assetFileNames: "main.css" },
     },
   },
 });

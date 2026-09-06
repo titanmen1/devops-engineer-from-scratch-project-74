@@ -26,6 +26,9 @@ export default {
     },
     views: {
       article: {
+        content: {
+          placeholder: "Введите содержимое статьи",
+        },
         create: {
           success: "Статья создана",
           error: "Не удалось создать статью",
@@ -37,13 +40,6 @@ export default {
         delete: {
           success: "Статья удалена",
           error: "Не удалось удалить статью",
-        },
-        title: {
-          label: "Заголовок",
-        },
-        content: {
-          label: "Содержимое",
-          placeholder: "Введите содержимое статьи",
         },
       },
       articles: {

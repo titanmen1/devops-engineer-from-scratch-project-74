@@ -1,23 +1,20 @@
 FROM node:26
 
-RUN npm install -g pnpm@11.24.0
-
 WORKDIR /app
 
 # Важно для кеширования слоев
 COPY app/package.json package.json
-COPY app/pnpm-lock.yaml pnpm-lock.yaml
-COPY app/pnpm-workspace.yaml pnpm-workspace.yaml
+COPY app/package-lock.json package-lock.json
 
-RUN pnpm install --frozen-lockfile
+RUN npm ci
 
 COPY app/. .
 
 EXPOSE 8080
 ENV NODE_ENV=production
-RUN pnpm run build
+RUN make build
 
 RUN chown -R node:node /app
 USER node
 
-CMD ["make", "start"]
+CMD make start

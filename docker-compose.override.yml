@@ -1,5 +1,9 @@
 services:
   app:
+    # Своё имя образа: иначе dev-сборка подменяется продакшен-образом из
+    # docker-compose.yml вместе с его NODE_ENV=production, и npm пропускает
+    # devDependencies, без которых не стартует сборка фронтенда
+    image: titanmen/devops-engineer-from-scratch-project-74-development
     build:
       context: .
       dockerfile: Dockerfile

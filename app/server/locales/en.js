@@ -3,14 +3,6 @@
 export default {
   translation: {
     appName: "Simple blog",
-    flash: {
-      articles: {
-        create: {
-          error: "Failed to create article",
-          success: "Article was created",
-        },
-      },
-    },
     layouts: {
       application: {
         articles: "Articles",
@@ -23,24 +15,20 @@ export default {
     },
     views: {
       article: {
+        content: {
+          placeholder: "Enter article content",
+        },
         create: {
-          success: "Success",
-          error: "Error",
+          success: "Article was created",
+          error: "Failed to create article",
         },
         edit: {
-          success: "Success",
-          error: "Error",
+          success: "Article was updated",
+          error: "Failed to update article",
         },
         delete: {
-          success: "Success",
-          error: "Error",
-        },
-        title: {
-          label: "Title",
-        },
-        content: {
-          label: "Content",
-          placeholder: "Enter article content",
+          success: "Article was deleted",
+          error: "Failed to delete article",
         },
       },
       articles: {
@@ -58,7 +46,7 @@ export default {
           submit: "Update",
         },
         new: {
-          header: "New article",
+          header: "New Article",
           submit: "Create",
         },
       },

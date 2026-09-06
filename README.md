@@ -45,9 +45,6 @@ make up
 # Тесты (внутри Docker, тот же образ, что и в CI)
 make test
 
-# Линтер и проверка форматирования (внутри Docker)
-make lint
-
 # Остановка
 make down
 ```

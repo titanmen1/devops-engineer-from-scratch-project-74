@@ -6,4 +6,5 @@ dist/
 tmp/
 temp/
 .env
-database/
+*.sqlite
+npm-cache/

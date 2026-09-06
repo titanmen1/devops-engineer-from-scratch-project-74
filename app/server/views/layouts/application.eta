@@ -1,21 +1,23 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Hexlet Fastify Blog</title>
+    <title>Hexlet Fastify Boilerplate</title>
     <link href="<%= it.assetPath('main.css') %>" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   </head>
-  <body class="flex min-h-screen flex-col bg-white text-gray-900">
-    <nav class="border-b border-gray-200 bg-gray-50">
-      <div class="mx-auto flex max-w-5xl items-center gap-6 px-4 py-3">
+  <body class="flex min-h-screen flex-col">
+    <nav class="mb-3 bg-gray-100 px-6 py-3">
+      <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-6">
         <a class="text-lg font-semibold" href="<%= it.route('root') %>"><%= it.t('appName') %></a>
-        <a class="text-sm text-gray-600" href="<%= it.route('articles') %>"><%= it.t('layouts.application.articles') %></a>
+        <ul class="flex flex-wrap items-center gap-4">
+          <li><a class="hover:underline" href="<%= it.route('articles') %>"><%= it.t('layouts.application.articles') %></a></li>
+        </ul>
       </div>
     </nav>
-    <div class="mx-auto w-full max-w-5xl flex-1 px-4">
+    <div class="mx-auto w-full max-w-5xl grow px-4">
       <% Object.entries(it.reply.flash() || {}).forEach(([type, messages]) => { %>
         <% messages.forEach((message) => { %>
-        <div class="mb-4 rounded border px-4 py-3 <%= it.getAlertClass(type) %>"><%= message %></div>
+        <div class="mt-4 rounded border px-4 py-3 <%= it.getAlertClass(type) %>" role="alert"><%= message %></div>
         <% }) %>
       <% }) %>
 
@@ -23,9 +25,9 @@
       <%~ it.body %>
     </div>
 
-    <footer class="mt-10 border-t border-gray-200">
-      <div class="mx-auto max-w-5xl px-4 py-6">
-        <a class="text-sm text-gray-600" target="_blank" href="https://ru.hexlet.io">Hexlet</a>
+    <footer>
+      <div class="mx-auto my-10 max-w-5xl border-t px-4 pt-4">
+        <a class="hover:underline" target="_blank" href="https://ru.hexlet.io">Hexlet</a>
       </div>
     </footer>
   </body>

@@ -2,56 +2,23 @@
 
 import { eq } from "drizzle-orm";
 import i18next from "i18next";
-import { articles } from "../../db/schema/index.js";
-import { validateArticle } from "../validators/article.js";
+
+const required = (value) => typeof value === "string" && value.trim() !== "";
+
+// Ошибки собираются в том виде, в котором их читают шаблоны: список записей с
+// полем `path` и сообщением. Раньше такой список отдавал sequelize из правил
+// модели, теперь правила заданы явно.
+const validate = (data) =>
+  [
+    required(data.title) ? null : { path: "title", message: "Не должно быть пустым" },
+    required(data.content) ? null : { path: "content", message: "Не должно быть пустым" },
+  ].filter(Boolean);
 
 export default (app) => {
-  const findArticle = async (id) => {
-    const [article] = await app.db
-      .select()
-      .from(articles)
-      .where(eq(articles.id, Number(id)))
-      .limit(1);
+  const { articles } = app.schema;
 
-    return article ?? null;
-  };
-
-  const updateArticle = async (req, reply) => {
-    const { id } = req.params;
-    const article = await findArticle(id);
-    const { data, errors } = validateArticle(req.body.data);
-
-    if (errors) {
-      req.flash("error", i18next.t("views.article.edit.error"));
-      reply.code(422);
-      reply.render("articles/edit", { article: { ...article, ...req.body.data }, errors });
-      return reply;
-    }
-
-    await app.db
-      .update(articles)
-      .set({ ...data, updatedAt: new Date().toISOString() })
-      .where(eq(articles.id, Number(id)));
-
-    req.flash("info", i18next.t("views.article.edit.success"));
-    reply.redirect(app.reverse("articles"));
-    return reply;
-  };
-
-  const destroyArticle = async (req, reply) => {
-    const { id } = req.params;
-
-    try {
-      await app.db.delete(articles).where(eq(articles.id, Number(id)));
-      req.flash("info", i18next.t("views.article.delete.success"));
-    } catch (e) {
-      console.log(e);
-      req.flash("error", i18next.t("views.article.delete.error"));
-    }
-
-    reply.redirect(app.reverse("articles"));
-    return reply;
-  };
+  const findArticle = (id) =>
+    app.db.query.articles.findFirst({ where: eq(articles.id, Number(id)) });
 
   app
     .get("/articles", { name: "articles" }, async (req, reply) => {
@@ -59,19 +26,20 @@ export default (app) => {
       return reply;
     })
     .get("/articles/new", { name: "newArticle" }, (req, reply) => {
-      reply.render("articles/new", { article: { title: "", content: "" } });
+      reply.render("articles/new", { article: {} });
     })
     .post("/articles", async (req, reply) => {
-      const { data, errors } = validateArticle(req.body.data);
+      const { data } = req.body;
+      const errors = validate(data);
 
-      if (errors) {
+      if (errors.length > 0) {
         req.flash("error", i18next.t("views.article.create.error"));
         reply.code(422);
-        reply.render("articles/new", { article: req.body.data ?? {}, errors });
+        reply.render("articles/new", { article: data, errors });
         return reply;
       }
 
-      await app.db.insert(articles).values(data);
+      await app.db.insert(articles).values({ title: data.title, content: data.content });
       req.flash("info", i18next.t("views.article.create.success"));
       reply.redirect(app.reverse("articles"));
       return reply;
@@ -84,9 +52,31 @@ export default (app) => {
       reply.render("articles/edit", { article: await findArticle(req.params.id) });
       return reply;
     })
-    // HTML-форма умеет только GET и POST, поэтому PATCH и DELETE приходят
-    // POST-запросом со скрытым полем `_method`. Разбирает его плагин
-    // @hexlet/fastify-method-override, подключённый в plugin.js.
-    .patch("/articles/:id", updateArticle)
-    .delete("/articles/:id", destroyArticle);
+    .patch("/articles/:id", async (req, reply) => {
+      const id = Number(req.params.id);
+      const { data } = req.body;
+      const errors = validate(data);
+
+      if (errors.length > 0) {
+        req.flash("error", i18next.t("views.article.edit.error"));
+        reply.code(422);
+        reply.render("articles/edit", { article: { ...data, id }, errors });
+        return reply;
+      }
+
+      await app.db
+        .update(articles)
+        .set({ title: data.title, content: data.content, updatedAt: new Date() })
+        .where(eq(articles.id, id));
+
+      req.flash("info", i18next.t("views.article.edit.success"));
+      reply.redirect(app.reverse("articles"));
+      return reply;
+    })
+    .delete("/articles/:id", async (req, reply) => {
+      await app.db.delete(articles).where(eq(articles.id, Number(req.params.id)));
+      req.flash("info", i18next.t("views.article.delete.success"));
+      reply.redirect(app.reverse("articles"));
+      return reply;
+    });
 };

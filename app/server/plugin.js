@@ -1,39 +1,46 @@
 // @ts-check
 
-import dbPlugin from "./plugins/db.js";
-import reversePlugin from "./plugins/reverse.js";
-import fastifyFlash from "@fastify/flash";
-import fastifyFormbody from "@fastify/formbody";
-import fastifyMethodOverride from "@hexlet/fastify-method-override";
-import fastifySecureSession from "@fastify/secure-session";
-import fastifySensible from "@fastify/sensible";
+import { fileURLToPath } from "url";
+import path from "path";
 import fastifyStatic from "@fastify/static";
 // NOTE: не поддердивает fastify 4.x
 // import fastifyErrorPage from 'fastify-error-page';
 import fastifyView from "@fastify/view";
-import i18next from "i18next";
-import path from "path";
-import { Eta } from "eta";
+import fastifyFormbody from "@fastify/formbody";
+import fastifySecureSession from "@fastify/secure-session";
+import fastifyFlash from "@fastify/flash";
+import fastifySensible from "@fastify/sensible";
+import reversePlugin from "./plugins/reverse.js";
+import fastifyMethodOverride from "@hexlet/fastify-method-override";
 import qs from "qs";
-import { fileURLToPath } from "url";
-import getHelpers from "./helpers/index.js";
-import en from "./locales/en.js";
+import { Eta } from "eta";
+import i18next from "i18next";
+
 import ru from "./locales/ru.js";
-// @ts-expect-error
+import en from "./locales/en.js";
+// @ts-ignore
 import addRoutes from "./routes/index.js";
+import getHelpers from "./helpers/index.js";
+import { buildDb, schema } from "./db/index.js";
 
 const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
 const mode = process.env.NODE_ENV || "development";
 const isDevelopment = mode === "development";
 
+const setUpDb = (app) => {
+  app.decorate("db", buildDb());
+  app.decorate("schema", schema);
+};
+
 const setUpViews = (app) => {
   const helpers = getHelpers(app);
+  const eta = new Eta();
+
   app.register(fastifyView, {
     engine: {
-      eta: new Eta(),
+      eta,
     },
-    includeViewExtension: true,
     defaultContext: {
       ...helpers,
       assetPath: (filename) => `/assets/${filename}`,
@@ -75,12 +82,10 @@ const addHooks = (app) => {
 };
 
 const registerPlugins = async (app) => {
-  await app.register(dbPlugin);
   await app.register(fastifySensible);
   // await app.register(fastifyErrorPage);
   await app.register(reversePlugin);
   await app.register(fastifyFormbody, { parser: qs.parse });
-  await app.register(fastifyMethodOverride);
   await app.register(fastifySecureSession, {
     secret: "4fe91796c30bd989d95b62dc46c7c3ba0b6aa2df2187400586a4121c54c53b85",
     cookie: {
@@ -88,6 +93,7 @@ const registerPlugins = async (app) => {
     },
   });
   await app.register(fastifyFlash);
+  await app.register(fastifyMethodOverride);
 };
 
 export const options = {
@@ -99,6 +105,7 @@ export default async (app, _options) => {
   await registerPlugins(app);
 
   await setupLocalization();
+  setUpDb(app);
   setUpViews(app);
   setUpStaticAssets(app);
   addRoutes(app);
