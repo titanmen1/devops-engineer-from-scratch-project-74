@@ -1,6 +1,7 @@
 setup: install build
 
 install:
+	corepack enable
 	pnpm install
 
 build:
