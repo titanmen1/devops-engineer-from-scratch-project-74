@@ -1,9 +1,5 @@
 services:
   app:
-    # Своё имя образа: иначе dev-сборка подменяется продакшен-образом из
-    # docker-compose.yml вместе с его NODE_ENV=production, и npm пропускает
-    # devDependencies, без которых не стартует сборка фронтенда
-    image: titanmen/devops-engineer-from-scratch-project-74-development
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,6 +7,11 @@ services:
       - ./app:/app
     ports:
       - "8080:8080"
+    # NODE_ENV сбрасывается явно: dev-сервис делит имя образа с продакшеном, и
+    # без этого npm видит production, пропускает devDependencies, а сборка
+    # фронтенда падает на отсутствующем vite
+    environment:
+      NODE_ENV: development
     command: make dev
 
   caddy:
